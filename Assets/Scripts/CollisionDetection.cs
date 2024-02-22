@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class CollisionDetection : MonoBehaviour
 {
+    public PlayerMover playerMover;
     float impactForce = 5f;
     float impactEffectDuration = 0.5f;
     bool isColliding = false;
@@ -14,7 +15,8 @@ public class CollisionDetection : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("obstr") && !isColliding)
         {
-            StartCrashSequence(collision.gameObject);
+            playerMover.HandleCollision();
+            // StartCrashSequence(collision.gameObject);
         }
     }
 

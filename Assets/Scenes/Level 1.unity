@@ -4798,6 +4798,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec469178ec9d3d941b6d70fff6866546, type: 3}
+--- !u!114 &803908004 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5454095926187186887, guid: 49845c95d57a1ea418f80e3a7d955d24, type: 3}
+  m_PrefabInstance: {fileID: 2049288700169012714}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e1567444d360d54c9dfd4d8fc8a6620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &819651035
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9778,6 +9789,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4701837017302708295, guid: 49845c95d57a1ea418f80e3a7d955d24, type: 3}
+      propertyPath: playerMover
+      value: 
+      objectReference: {fileID: 803908004}
     - target: {fileID: 5454095926187186887, guid: 49845c95d57a1ea418f80e3a7d955d24, type: 3}
       propertyPath: waypoints.Array.data[0]
       value: 
