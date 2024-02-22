@@ -5,36 +5,103 @@ using UnityEngine;
 public class PlayerMover : MonoBehaviour
 {
     public Transform[] waypoints;
-    public float speed = 20f;
-    public float rotationSpeed = 5f;
+    private int collisionMoveBackDistance = 2;
     private int currentWaypointIndex = 0;
 
-    void Update()
+    public float moveSpeed = 5f; // Movement speed towards the waypoint
+    public float turnSpeed = 10f; // Rotation speed to look at the waypoint
+    public float reachThreshold = 0.1f; // Distance threshold to consider the waypoint reached
+
+    private bool isMoving = true;
+
+    public float collisionPauseDuration = 1f;
+
+    private void Update()
     {
-        if (currentWaypointIndex < waypoints.Length)
+        if (isMoving)
         {
-            Vector3 targetPosition = waypoints[currentWaypointIndex].position;
-
-            // transform.LookAt(targetPosition, Vector3.up);
-            // transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-
-            transform.position = transform.forward * speed * Time.deltaTime;
-            // if (Vector3.Distance(transform.position, targetPosition) > 0.1f)
-            // {
-            //     Vector3 direction = (targetPosition - transform.position).normalized;
-            //     Quaternion lookRotation = Quaternion.LookRotation(direction);
-            //     // transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-            //     transform.rotation = lookRotation;
-            // }
-
-            if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
-            {
-                currentWaypointIndex++;
-            }
-            // if (transform.position == targetPosition)
-            // {
-            //     currentWaypointIndex++;
-            // }
+            MoveTowardsWaypoint();
+            RotateTowardsWaypoint();
         }
+    }
+
+    void MoveTowardsWaypoint()
+    {
+        if (waypoints.Length == 0) return; // Exit if no waypoints are set
+
+        // Get the current waypoint target
+        Transform targetWaypoint = waypoints[currentWaypointIndex];
+        Vector3 directionToWaypoint = targetWaypoint.position - transform.position;
+        Vector3 moveVector = directionToWaypoint.normalized * moveSpeed * Time.deltaTime;
+
+        // Move towards the waypoint
+        transform.position += moveVector;
+
+        // Check if the waypoint is reached
+        if (directionToWaypoint.magnitude < reachThreshold)
+        {
+            // Increment waypoint index or reset to 0 if at the end
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+        }
+    }
+
+    public void HandleCollision()
+    {
+        if (isMoving) // Prevent overlapping collision handling
+        {
+            StartCoroutine(CollisionResponseCoroutine());
+        }
+    }
+
+    IEnumerator CollisionResponseCoroutine()
+    {
+        isMoving = false; // Stop movement immediately to simulate collision impact
+
+        // Calculate the start and end positions for the backward movement
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition - transform.forward * collisionMoveBackDistance;
+
+        float elapsedTime = 0f;
+        float moveBackTime = 0.5f; // Duration of the move back action. Adjust as needed.
+
+        // Define a bouncy animation curve
+        AnimationCurve bounceCurve = new AnimationCurve(
+        new Keyframe(0f, 0f),
+        new Keyframe(Random.Range(0.15f, 0.25f), Random.Range(1.1f, 1.3f)), // Dynamic peak
+        new Keyframe(Random.Range(0.45f, 0.55f), Random.Range(0.5f, 0.7f)),  // Dynamic dip
+        new Keyframe(Random.Range(0.75f, 0.85f), Random.Range(1.0f, 1.2f)), // Dynamic rise
+        new Keyframe(1f, 1f)
+    );
+
+        // Smoothly move the player back with a bouncy effect over moveBackTime seconds
+        while (elapsedTime < moveBackTime)
+        {
+            float t = bounceCurve.Evaluate(elapsedTime / moveBackTime);
+            transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            elapsedTime += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+
+        // Ensure the player is exactly at the end position after moving back
+        transform.position = endPosition;
+
+        yield return new WaitForSeconds(collisionPauseDuration); // Wait after moving back before resuming movement
+
+        isMoving = true; // Resume normal movement
+    }
+
+
+    void RotateTowardsWaypoint()
+    {
+        if (waypoints.Length == 0) return; // Exit if no waypoints are set
+
+        // Direction from current position to the target waypoint
+        Vector3 targetDirection = waypoints[currentWaypointIndex].position - transform.position;
+
+        // Calculate the rotation needed to look at the waypoint
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+        // Rotate towards the waypoint
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
     }
 }
