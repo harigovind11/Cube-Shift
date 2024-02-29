@@ -8,7 +8,7 @@ public class PlayerMover : MonoBehaviour
     private int collisionMoveBackDistance = 2;
     private int currentWaypointIndex = 0;
 
-    public float moveSpeed = 5f; // Movement speed towards the waypoint
+    public float moveSpeed = 15f; // Movement speed towards the waypoint
     public float turnSpeed = 10f; // Rotation speed to look at the waypoint
     public float reachThreshold = 0.1f; // Distance threshold to consider the waypoint reached
 
@@ -29,6 +29,7 @@ public class PlayerMover : MonoBehaviour
     {
         if (waypoints.Length == 0) return; // Exit if no waypoints are set
 
+
         // Get the current waypoint target
         Transform targetWaypoint = waypoints[currentWaypointIndex];
         Vector3 directionToWaypoint = targetWaypoint.position - transform.position;
@@ -42,54 +43,12 @@ public class PlayerMover : MonoBehaviour
         {
             // Increment waypoint index or reset to 0 if at the end
             currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.Length;
+            if (currentWaypointIndex == 0)
+            {
+                GameManager.instance.NextLevel();
+            }
         }
     }
-
-    public void HandleCollision()
-    {
-        if (isMoving) // Prevent overlapping collision handling
-        {
-            StartCoroutine(CollisionResponseCoroutine());
-        }
-    }
-
-    IEnumerator CollisionResponseCoroutine()
-    {
-        isMoving = false; // Stop movement immediately to simulate collision impact
-
-        // Calculate the start and end positions for the backward movement
-        Vector3 startPosition = transform.position;
-        Vector3 endPosition = startPosition - transform.forward * collisionMoveBackDistance;
-
-        float elapsedTime = 0f;
-        float moveBackTime = 0.5f; // Duration of the move back action. Adjust as needed.
-
-        // Define a bouncy animation curve
-        AnimationCurve bounceCurve = new AnimationCurve(
-        new Keyframe(0f, 0f),
-        new Keyframe(Random.Range(0.15f, 0.25f), Random.Range(1.1f, 1.3f)), // Dynamic peak
-        new Keyframe(Random.Range(0.45f, 0.55f), Random.Range(0.5f, 0.7f)),  // Dynamic dip
-        new Keyframe(Random.Range(0.75f, 0.85f), Random.Range(1.0f, 1.2f)), // Dynamic rise
-        new Keyframe(1f, 1f)
-    );
-
-        // Smoothly move the player back with a bouncy effect over moveBackTime seconds
-        while (elapsedTime < moveBackTime)
-        {
-            float t = bounceCurve.Evaluate(elapsedTime / moveBackTime);
-            transform.position = Vector3.Lerp(startPosition, endPosition, t);
-            elapsedTime += Time.deltaTime;
-            yield return null; // Wait for the next frame
-        }
-
-        // Ensure the player is exactly at the end position after moving back
-        transform.position = endPosition;
-
-        yield return new WaitForSeconds(collisionPauseDuration); // Wait after moving back before resuming movement
-
-        isMoving = true; // Resume normal movement
-    }
-
 
     void RotateTowardsWaypoint()
     {
@@ -103,5 +62,54 @@ public class PlayerMover : MonoBehaviour
 
         // Rotate towards the waypoint
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+    }
+
+    public void HandleCollision()
+    {
+        if (isMoving) // Prevent overlapping collision handling
+        {
+            StartCoroutine(CollisionResponseCoroutine());
+            PlayerHealth.instance.ProcessHit();
+            GameManager.instance.CrashAudio();
+        }
+    }
+
+    IEnumerator CollisionResponseCoroutine()
+    {
+        isMoving = false; // Stop movement immediately to simulate collision impact
+
+
+        // Calculate the start and end positions for the backward movement
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition - transform.forward * collisionMoveBackDistance;
+
+        float elapsedTime = 0f;
+        float moveBackTime = 0.5f; // Duration of the move back action. Adjust as needed.
+
+        // Define a bouncy animation curve
+        AnimationCurve bounceCurve = new AnimationCurve(
+            new Keyframe(0f, 0f),
+            new Keyframe(Random.Range(0.15f, 0.25f), Random.Range(1.1f, 1.3f)), // Dynamic peak
+            new Keyframe(Random.Range(0.45f, 0.55f), Random.Range(0.5f, 0.7f)), // Dynamic dip
+            new Keyframe(Random.Range(0.75f, 0.85f), Random.Range(1.0f, 1.2f)), // Dynamic rise
+            new Keyframe(1f, 1f)
+        );
+
+        // Smoothly move the player back with a bouncy effect over moveBackTime seconds
+        while (elapsedTime < moveBackTime)
+        {
+            float t = bounceCurve.Evaluate(elapsedTime / moveBackTime);
+            transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            elapsedTime += Time.deltaTime;
+            yield return null; // Wait for the next frame
+        }
+
+        // Ensure the player is exactly at the end position after moving back
+        transform.position = endPosition;
+
+
+        yield return new WaitForSeconds(collisionPauseDuration); // Wait after moving back before resuming movement
+
+        isMoving = true; // Resume normal movement
     }
 }
