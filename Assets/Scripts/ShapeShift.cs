@@ -41,10 +41,9 @@ public class ShapeShift : MonoBehaviour
         ghostCube.transform.localScale = transform.localScale;
         ghostCube.transform.rotation = player.transform.rotation;
 
-
         float distance = Vector3.Distance(transform.position, obstructionPositions[nextObstructionIndex].position);
 
-        if (distance > 10)
+        if (distance > 15)
         {
             ghostCube.SetActive(false);
             ghostCubePath.SetActive(false);
@@ -54,7 +53,6 @@ public class ShapeShift : MonoBehaviour
             ghostCube.SetActive(true);
             ghostCubePath.SetActive(true);
         }
-
 
         SetGhostPath();
     }
@@ -86,10 +84,11 @@ public class ShapeShift : MonoBehaviour
     public void HandleCollision()
     {
         GameManager.instance.PassAudio();
-        // Increment the index to the next obstruction position if within bounds
-        if (nextObstructionIndex < obstructionPositions.Count - 1)
+        // Increment the index to the next obstruction position
+        nextObstructionIndex++;
+        // Check if the next obstruction index is within the list bounds
+        if (nextObstructionIndex < obstructionPositions.Count)
         {
-            nextObstructionIndex++;
             // Set the position of the ghost cube to the position of the next obstruction
             SetGhostPosition(obstructionPositions[nextObstructionIndex].position);
         }

@@ -11,13 +11,11 @@ public class CollisionDetection : MonoBehaviour
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.CompareTag("obstr"))
+        if (collider.gameObject.CompareTag("obstr"))
         {
             playerMover.HandleCollision();
-            
 
             collider.gameObject.SetActive(false);
-            // collider.gameObject.GetComponentInParent<BoxCollider>().enabled = false;
         }
         else if (collider.CompareTag("Inside"))
         {
