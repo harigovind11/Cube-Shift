@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class ShapeShift : MonoBehaviour
 {
@@ -13,12 +11,11 @@ public class ShapeShift : MonoBehaviour
     [SerializeField] float minHeight = 1f;
     [SerializeField] float maxHeight = 5f;
 
-    [SerializeField] GameObject player;
-    [SerializeField] GameObject ghostCube;
-    [SerializeField] GameObject ghostCubePath;
+    [SerializeField] float scaleSpeed = 0.005f; // Increase or decrease to adjust sensitivity
 
-    [SerializeField] List<Transform> obstructionPositions = new List<Transform>();
-    private int nextObstructionIndex = 0;
+
+    private Vector2 startPosition;
+    private bool isInteracting = false;
 
 
     void Start()
@@ -27,75 +24,69 @@ public class ShapeShift : MonoBehaviour
         {
             instance = this;
         }
-
-        if (obstructionPositions.Count > 0)
-        {
-            SetGhostPosition(obstructionPositions[nextObstructionIndex].position);
-        }
     }
 
     void Update()
     {
-        PlayerInput();
-
-        ghostCube.transform.localScale = transform.localScale;
-        ghostCube.transform.rotation = player.transform.rotation;
-
-        float distance = Vector3.Distance(transform.position, obstructionPositions[nextObstructionIndex].position);
-
-        if (distance > 15)
+        if (Input.touchSupported && Input.touchCount > 0)
         {
-            ghostCube.SetActive(false);
-            ghostCubePath.SetActive(false);
+            HandleTouchInput();
         }
         else
         {
-            ghostCube.SetActive(true);
-            ghostCubePath.SetActive(true);
+            HandleMouseInput();
         }
-
-        SetGhostPath();
     }
 
-    void PlayerInput()
+    void HandleTouchInput()
     {
-        float verticalInput = Input.GetAxis("Vertical");
+        Touch touch = Input.GetTouch(0);
 
-        float newHeight = Mathf.Lerp(minHeight, maxHeight, Mathf.InverseLerp(-1f, 1f, verticalInput));
-        float newWidth = Mathf.Lerp(minWidth, maxWidth, Mathf.InverseLerp(-1f, 1f, -verticalInput));
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
+                startPosition = touch.position;
+                isInteracting = true;
+                break;
+            case TouchPhase.Moved:
+                if (isInteracting)
+                {
+                    AdjustScale(touch.position);
+                }
 
-        // Update the scale of the original cube
+                break;
+            case TouchPhase.Ended:
+            case TouchPhase.Canceled:
+                isInteracting = false;
+                break;
+        }
+    }
+
+    void HandleMouseInput()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            startPosition = Input.mousePosition;
+            isInteracting = true;
+        }
+        else if (Input.GetMouseButton(0) && isInteracting)
+        {
+            AdjustScale(Input.mousePosition);
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            isInteracting = false;
+        }
+    }
+
+    void AdjustScale(Vector2 currentPosition)
+    {
+        float verticalMovement = currentPosition.y - startPosition.y;
+        float normalizedMovement = Mathf.Clamp(verticalMovement * scaleSpeed, -1f, 1f);
+
+        float newHeight = Mathf.Lerp(minHeight, maxHeight, (normalizedMovement + 1) / 2);
+        float newWidth = Mathf.Lerp(minWidth, maxWidth, 1 - (normalizedMovement + 1) / 2);
+
         transform.localScale = new Vector3(newWidth, newHeight, transform.localScale.z);
-    }
-
-    void SetGhostPath()
-    {
-        float ghostCubePathLength = Vector3.Distance(transform.position, ghostCube.transform.position);
-
-        Vector3 ghostCubePathSize = new Vector3(transform.localScale.x, transform.localScale.y, ghostCubePathLength);
-        ghostCubePath.transform.localScale = ghostCubePathSize;
-    }
-
-    void SetGhostPosition(Vector3 position)
-    {
-        ghostCube.transform.position = new Vector3(position.x, transform.position.y, position.z);
-    }
-
-    public void HandleCollision()
-    {
-        GameManager.instance.PassAudio();
-        // Increment the index to the next obstruction position
-        nextObstructionIndex++;
-        // Check if the next obstruction index is within the list bounds
-        if (nextObstructionIndex < obstructionPositions.Count)
-        {
-            // Set the position of the ghost cube to the position of the next obstruction
-            SetGhostPosition(obstructionPositions[nextObstructionIndex].position);
-        }
-        else
-        {
-            Debug.Log("No more obstructions.");
-            // Optionally, you can disable the ghost cube or perform other actions when there are no more obstructions
-        }
     }
 }

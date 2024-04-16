@@ -14,12 +14,12 @@ public class CollisionDetection : MonoBehaviour
         if (collider.gameObject.CompareTag("obstr"))
         {
             playerMover.HandleCollision();
-
             collider.gameObject.SetActive(false);
+            collider.gameObject.GetComponentInParent<BoxCollider>().enabled = false;
         }
         else if (collider.CompareTag("Inside"))
         {
-            ShapeShift.instance.HandleCollision();
+            GhostMover.instance.HandleCollision();
         }
     }
 }

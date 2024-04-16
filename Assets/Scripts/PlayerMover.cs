@@ -71,6 +71,7 @@ public class PlayerMover : MonoBehaviour
             StartCoroutine(CollisionResponseCoroutine());
             PlayerHealth.instance.ProcessHit();
             GameManager.instance.CrashAudio();
+            GhostMover.instance.IncrementObstructionIndex();
         }
     }
 
