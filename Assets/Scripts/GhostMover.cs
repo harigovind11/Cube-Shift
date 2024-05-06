@@ -69,6 +69,11 @@ public class GhostMover : MonoBehaviour
     public void HandleCollision()
     {
         GameManager.instance.PassAudio();
+        IncrementObstructionIndex();
+    }
+
+    public void IncrementObstructionIndex()
+    {
         nextObstructionIndex++;
         if (nextObstructionIndex < obstructionPositions.Count)
         {
@@ -78,10 +83,5 @@ public class GhostMover : MonoBehaviour
         {
             Debug.Log("No more obstructions.");
         }
-    }
-
-    public void IncrementObstructionIndex()
-    {
-        nextObstructionIndex++;
     }
 }
