@@ -16,7 +16,7 @@ public class PlayerMover : MonoBehaviour
 
     public float collisionPauseDuration = 1f;
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isMoving)
         {
