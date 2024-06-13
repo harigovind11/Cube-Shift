@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMover : MonoBehaviour
@@ -21,6 +20,13 @@ public class PlayerMover : MonoBehaviour
         if (isMoving)
         {
             MoveTowardsWaypoint();
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (isMoving)
+        {
             RotateTowardsWaypoint();
         }
     }
@@ -29,11 +35,10 @@ public class PlayerMover : MonoBehaviour
     {
         if (waypoints.Length == 0) return; // Exit if no waypoints are set
 
-
         // Get the current waypoint target
         Transform targetWaypoint = waypoints[currentWaypointIndex];
         Vector3 directionToWaypoint = targetWaypoint.position - transform.position;
-        Vector3 moveVector = directionToWaypoint.normalized * moveSpeed * Time.deltaTime;
+        Vector3 moveVector = directionToWaypoint.normalized * moveSpeed * Time.fixedDeltaTime;
 
         // Move towards the waypoint
         transform.position += moveVector;
@@ -79,7 +84,6 @@ public class PlayerMover : MonoBehaviour
     {
         isMoving = false; // Stop movement immediately to simulate collision impact
 
-
         // Calculate the start and end positions for the backward movement
         Vector3 startPosition = transform.position;
         Vector3 endPosition = startPosition - transform.forward * collisionMoveBackDistance;
@@ -90,9 +94,9 @@ public class PlayerMover : MonoBehaviour
         // Define a bouncy animation curve
         AnimationCurve bounceCurve = new AnimationCurve(
             new Keyframe(0f, 0f),
-            new Keyframe(Random.Range(0.15f, 0.25f), Random.Range(1.1f, 1.3f)), // Dynamic peak
-            new Keyframe(Random.Range(0.45f, 0.55f), Random.Range(0.5f, 0.7f)), // Dynamic dip
-            new Keyframe(Random.Range(0.75f, 0.85f), Random.Range(1.0f, 1.2f)), // Dynamic rise
+            new Keyframe(0.2f, 1.2f), // Dynamic peak
+            new Keyframe(0.5f, 0.6f), // Dynamic dip
+            new Keyframe(0.8f, 1.1f), // Dynamic rise
             new Keyframe(1f, 1f)
         );
 
@@ -107,7 +111,6 @@ public class PlayerMover : MonoBehaviour
 
         // Ensure the player is exactly at the end position after moving back
         transform.position = endPosition;
-
 
         yield return new WaitForSeconds(collisionPauseDuration); // Wait after moving back before resuming movement
 
