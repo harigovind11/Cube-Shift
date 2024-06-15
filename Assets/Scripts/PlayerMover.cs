@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -14,27 +15,31 @@ public class PlayerMover : MonoBehaviour
     private bool isMoving = true;
 
     public float collisionPauseDuration = 1f;
+    private Vector3 nextDestination = Vector3.zero;
+
+    private Vector3 currentVelocity;
+
+    private void Start()
+    {
+        currentWaypointIndex = 0;
+        nextDestination = waypoints[currentWaypointIndex].transform.position;
+    }
 
     private void FixedUpdate()
     {
         if (isMoving)
         {
-            MoveTowardsWaypoint();
-        }
-    }
-
-    private void LateUpdate()
-    {
-        if (isMoving)
-        {
-            RotateTowardsWaypoint();
+            if (waypoints.Length == 0) return; // Exit if no waypoints are set
+            CheckAndUpdateTargetLocation();
+            MoveTowardsDestination();
+            RotateTowardsDestination();
+           // MoveTowardsWaypoint();
         }
     }
 
     void MoveTowardsWaypoint()
     {
         if (waypoints.Length == 0) return; // Exit if no waypoints are set
-
         // Get the current waypoint target
         Transform targetWaypoint = waypoints[currentWaypointIndex];
         Vector3 directionToWaypoint = targetWaypoint.position - transform.position;
@@ -53,6 +58,35 @@ public class PlayerMover : MonoBehaviour
                 GameManager.instance.NextLevel();
             }
         }
+    }
+
+    private void CheckAndUpdateTargetLocation()
+    {
+        if (Vector3.Distance(this.transform.position, nextDestination) < 0.002)
+        {
+            currentWaypointIndex++;
+            if (currentWaypointIndex == waypoints.Length)
+            {
+                //Debug.Log("game over called");
+                isMoving = false;
+                GameManager.instance.NextLevel();
+                return;
+            }
+            nextDestination = waypoints[currentWaypointIndex].transform.position;
+        }
+    }
+
+    private void MoveTowardsDestination()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, nextDestination, moveSpeed * Time.deltaTime);
+    }
+
+    private void RotateTowardsDestination()
+    {
+        if (waypoints.Length == 0) return;
+        Vector3 targetDirection = nextDestination - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
     }
 
     void RotateTowardsWaypoint()
