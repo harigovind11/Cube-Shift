@@ -20,6 +20,7 @@ public class CollisionDetection : MonoBehaviour
         else if (collider.CompareTag("Inside"))
         {
             GhostMover.instance.HandleCollision();
+            Score.instance.UpdateScore();
         }
     }
 }
