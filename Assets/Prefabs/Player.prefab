@@ -90,6 +90,8 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -159,7 +161,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.6509434, g: 0.20572266, b: 0.43749538, a: 0}
+  m_BackGroundColor: {r: 0.24705882, g: 0.5764706, b: 0.44313726, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -324,8 +326,12 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  moveSpeed: 15
-  turnSpeed: 10
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  moveSpeed: 20
+  turnSpeed: 8
   reachThreshold: 0.1
   collisionPauseDuration: 0.25
 --- !u!54 &5881097385925435121
@@ -381,6 +387,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitpoint: 3
+  currentHealth: 0
+  hearts:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  fullHeart: {fileID: -402404446, guid: 91dd6e257a80fa54fab9f4a349a79615, type: 3}
+  emptyHeart: {fileID: 657376064, guid: 91dd6e257a80fa54fab9f4a349a79615, type: 3}
 --- !u!1 &5409227935883325888
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,6 +453,8 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -496,6 +511,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1864408743591861273}
   - component: {fileID: 6429950593248851828}
+  - component: {fileID: 8677546802000861816}
+  - component: {fileID: 6753798721542345533}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -535,6 +552,19 @@ MonoBehaviour:
   maxWidth: 5
   minHeight: 1
   maxHeight: 5
+  scaleSpeed: 0.002
+--- !u!114 &8677546802000861816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7229496772946946230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1304a1c4c79f1645892e663580ee9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   player: {fileID: 3157749328480743503}
   ghostCube: {fileID: 0}
   ghostCubePath: {fileID: 249296326715891718}
@@ -555,3 +585,56 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  nextObstructionIndex: 0
+--- !u!114 &6753798721542345533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7229496772946946230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1304a1c4c79f1645892e663580ee9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 3157749328480743503}
+  ghostCube: {fileID: 0}
+  ghostCubePath: {fileID: 249296326715891718}
+  obstructionPositions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  nextObstructionIndex: 0

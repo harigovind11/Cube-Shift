@@ -53,10 +53,11 @@ public class GameManager : MonoBehaviour
         int nextSceneIndex = currentSceneIndex + 1;
         if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
-            nextSceneIndex = 0;
+            nextSceneIndex = 1;
         }
-        PlayerPrefs.SetInt("CurrentScore",Score.instance._score);
         SceneManager.LoadScene(nextSceneIndex);
+        PlayerPrefs.SetInt("CurrentScore",Score.instance._score);
+        
     }
 
     public void ReloadGame()
